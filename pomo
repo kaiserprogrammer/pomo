@@ -1,0 +1,94 @@
+#!/bin/bash
+
+while getopts klp:t:m:e:u: flag
+do
+    case "${flag}" in
+        p) pid=${OPTARG};;
+        t) time=${OPTARG};;
+        m) message=${OPTARG};;
+        e) endtime=${OPTARG};;
+        u) unix_endtime=${OPTARG};;
+    esac
+done
+
+for arg in "$@"
+do
+    if [ -v kill_id_next ]; then
+        kid=$arg
+        unset kill_id_next
+    elif [ "$arg" = "l" -o "$arg" = "-l" ]; then
+        list=true;
+    elif [ "$arg" = "k" -o "$arg" = "-k" ]; then
+        kill=true;
+        kill_id_next=true;
+    fi
+done
+
+max_pomid=0
+
+IFS=$'\n'
+lines=($(ps -fC pomo | tr -s ' ' | tail -n +2))
+
+output=("ID NAME REMAINING
+")
+for wline in ${lines[@]}
+do
+    prid=$(echo $wline | cut -d " " -f2)
+    line=$(echo $wline | cut -d " " -f10-)
+    pomid=""
+    endtime=""
+    IFS=" "
+    next=""
+    for arg in $line
+    do
+        case $next in
+            endtime) endtime=$arg;;
+            message) message=$arg;;
+            pomid) pomid=$arg; max_pomid=$(( $arg > max_pomid ? $arg : max_pomid ));;
+        esac
+
+        if [ "$arg" = "l" -o "$arg" = "-l" -o "$arg" = "k" -o "$arg" = "-k" ] ; then
+            skip=true
+        elif [ "$arg" = "-p" ] ; then
+            next="pomid"
+        elif [ "$arg" = "-u" ] ; then
+            next="endtime"
+        elif [ "$arg" = "-m" ] ; then
+            next="message"
+        else
+            next=""
+        fi
+    done
+
+    if [ -v skip ]; then :
+    elif [ -v list ]; then
+        seconds=$(expr $endtime - $(date +%s))
+        remaining="$(date -d "0 + $seconds seconds" +%H:%M:%S)"
+        output+=("$pomid $message $remaining
+")
+    elif [ -v kill -a "$kid" = "$pomid" ]; then
+        kill $prid
+    fi
+done
+
+
+if [ -v pid ]; then
+    sleep $time && notify-send -t 500000 $message
+elif [ -v kill ]; then :
+elif [ -v list ]; then
+    echo ${output[@]} | column -t
+else
+    IFS=""
+
+    split=$(grep -Eo '[[:alpha:]]+|[0-9]+' <<< "$1")
+    amount=$(head -n1 <<< $split)
+    unit=$(tail -n1 <<< $split)
+    case $unit in
+        s) unit="seconds";;
+        m) unit="minutes";;
+        h) unit="hours";;
+    esac
+
+    $0 -p $(expr $max_pomid + 1) -t $1 -m $2 -u $(date -d "+ $amount $unit" +%s) -e $(date -d "+ $amount $unit" --rfc-3339=s) &
+fi
+
