@@ -10,7 +10,7 @@ pomo 1h another-task
 
 ### List Active Timers
 ```bash
-pomo l
+pomo
 ```
 OUTPUT:
 ```console

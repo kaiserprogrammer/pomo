@@ -11,6 +11,10 @@ do
     esac
 done
 
+if [ $# -eq 0 ]; then
+    list=true;
+fi
+
 for arg in "$@"
 do
     if [ -v kill_id_next ]; then
@@ -39,6 +43,7 @@ do
     endtime=""
     IFS=" "
     next=""
+    skip=true
     for arg in $line
     do
         case $next in
@@ -48,12 +53,15 @@ do
         esac
 
         if [ "$arg" = "l" -o "$arg" = "-l" -o "$arg" = "k" -o "$arg" = "-k" ] ; then
-            skip=true
+            :
         elif [ "$arg" = "-p" ] ; then
+            unset skip
             next="pomid"
         elif [ "$arg" = "-u" ] ; then
+            unset skip
             next="endtime"
         elif [ "$arg" = "-m" ] ; then
+            unset skip
             next="message"
         else
             next=""
