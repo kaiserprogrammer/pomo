@@ -1,13 +1,14 @@
 # pomo
 CMD-line Pomodoro timer
 
-## Start Pomodoro
+## Commands
+### Start Pomodoro
 ```bash
 pomo 25m task
 pomo 1h another-task
 ```
 
-## List Active Timers
+### List Active Timers
 ```bash
 pomo l
 ```
@@ -18,7 +19,20 @@ ID  NAME          REMAINING
 2   another-task  00:59:58
 ```
 
-## Kill Timers
+### Kill Timers
 ```bash
 pomo k 2
 ```
+
+## Installation
+
+Copy file in your bin folder and make it executable
+
+```bash
+chmod a+x pomo
+cp pomo /usr/bin/
+```
+
+## Dependencies
+
+* notify-send
