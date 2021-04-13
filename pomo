@@ -66,8 +66,10 @@ do
         remaining="$(date -d "0 + $seconds seconds" +%H:%M:%S)"
         output+=("$pomid $message $remaining
 ")
-    elif [ -v kill -a "$kid" = "$pomid" ]; then
-        kill $prid
+    elif [ -v kill ]; then
+        if [ "$kid" = "$pomid" -o "$kid" = "" ]; then
+            kill $prid
+        fi
     fi
 done
 

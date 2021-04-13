@@ -20,6 +20,12 @@ ID  NAME          REMAINING
 ```
 
 ### Kill Timers
+#### All
+```bash
+pomo k
+```
+
+#### Specific
 ```bash
 pomo k 2
 ```
