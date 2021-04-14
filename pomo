@@ -90,14 +90,22 @@ elif [ -v list ]; then
 else
     IFS=""
 
-    split=$(grep -Eo '[[:alpha:]]+|[0-9]+' <<< "$1")
-    amount=$(head -n1 <<< $split)
-    unit=$(tail -n1 <<< $split)
+    amount=$(grep -Eo '[0-9]+' <<< "$1")
+    unit=$(grep -Eo '[[:alpha:]]' <<< "$1")
     case $unit in
         s) unit="seconds";;
         m) unit="minutes";;
         h) unit="hours";;
+        *) echo "please use valid sleep time like '${amount}h' or '${amount}m' or '${amount}s'"; exit
     esac
+
+    if [ -z $amount ]; then
+        echo "no sleep time specified"; exit
+    elif [ -z $unit ]; then
+        echo "no unit specified"; exit
+    elif [ -z $2 ]; then
+        echo "no task specified"; exit
+    fi
 
     $0 -p $(expr $max_pomid + 1) -t $1 -m $2 -u $(date -d "+ $amount $unit" +%s) -e $(date -d "+ $amount $unit" --rfc-3339=s) &
 fi
