@@ -91,8 +91,8 @@ else
     IFS=""
 
     amount=$(grep -Eo '[0-9]+' <<< "$1")
-    unit=$(grep -Eo '[[:alpha:]]' <<< "$1")
-    case $unit in
+    sleep_unit=$(grep -Eo '[[:alpha:]]' <<< "$1")
+    case $sleep_unit in
         s) unit="seconds";;
         m) unit="minutes";;
         h) unit="hours";;
@@ -107,6 +107,6 @@ else
         echo "no task specified"; exit
     fi
 
-    $0 -p $(expr $max_pomid + 1) -t $1 -m $2 -u $(date -d "+ $amount $unit" +%s) -e $(date -d "+ $amount $unit" --rfc-3339=s) &
+    $0 -p $(expr $max_pomid + 1) -t $amount$sleep_unit -m $2 -u $(date -d "+ $amount $unit" +%s) -e $(date -d "+ $amount $unit" --rfc-3339=s) &
 fi
 
