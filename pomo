@@ -92,6 +92,10 @@ else
 
     amount=$(grep -Eo '[0-9]+' <<< "$1")
     sleep_unit=$(grep -Eo '[[:alpha:]]' <<< "$1")
+    if [ -z $sleep_unit ]; then
+        sleep_unit="m"
+    fi
+
     case $sleep_unit in
         s) unit="seconds";;
         m) unit="minutes";;
