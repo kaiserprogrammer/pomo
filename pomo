@@ -25,6 +25,11 @@ do
     elif [ "$arg" = "k" -o "$arg" = "-k" ]; then
         kill=true;
         kill_id_next=true;
+    elif [ "$arg" = "h" -o "$arg" = "-h" -o "$arg" = "-?" -o "$arg" = "--help" ]; then
+        echo """Usage: pomo NUMBER[SUFFIX] NAME
+Display NAME in a notification after NUMBER minutes.  SUFFIX may be 's' for seconds (the default),
+'m' for minutes, 'h' for hours or 'd' for days."""
+        exit
     fi
 done
 
