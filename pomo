@@ -91,7 +91,9 @@ if [ -v pid ]; then
     sleep $time && notify-send -t 500000 $message
 elif [ -v kill ]; then :
 elif [ -v list ]; then
-    echo ${output[@]} | column -t
+    if [ ${#output[@]} -gt 1 ]; then
+        echo ${output[@]} | column -t
+    fi
 else
     IFS=""
 
