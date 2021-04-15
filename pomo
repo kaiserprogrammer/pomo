@@ -26,8 +26,8 @@ do
         kill=true;
         kill_id_next=true;
     elif [ "$arg" = "h" -o "$arg" = "-h" -o "$arg" = "-?" -o "$arg" = "--help" ]; then
-        echo """Usage: pomo NUMBER[SUFFIX] NAME
-Display NAME in a notification after NUMBER minutes.  SUFFIX may be 's' for seconds (the default),
+        echo """Usage: pomo [NUMBER[SUFFIX]] NAME
+Display NAME in a notification after NUMBER(25) minutes.  SUFFIX may be 's' for seconds (the default),
 'm' for minutes, 'h' for hours or 'd' for days."""
         exit
     fi
@@ -95,8 +95,16 @@ elif [ -v list ]; then
 else
     IFS=""
 
-    amount=$(grep -Eo '[0-9]+' <<< "$1")
-    sleep_unit=$(grep -Eo '[[:alpha:]]' <<< "$1")
+    if [ -z $2 ]; then
+        amount=25
+        sleep_unit=m
+        task=$1
+    else
+        task=$2
+        amount=$(grep -Eo '[0-9]+' <<< "$1")
+        sleep_unit=$(grep -Eo '[[:alpha:]]' <<< "$1")
+    fi
+
     if [ -z $sleep_unit ]; then
         sleep_unit="m"
     fi
@@ -112,10 +120,10 @@ else
         echo "no sleep time specified"; exit
     elif [ -z $unit ]; then
         echo "no unit specified"; exit
-    elif [ -z $2 ]; then
+    elif [ -z $task ]; then
         echo "no task specified"; exit
     fi
 
-    $0 -p $(expr $max_pomid + 1) -t $amount$sleep_unit -m $2 -u $(date -d "+ $amount $unit" +%s) -e $(date -d "+ $amount $unit" --rfc-3339=s) &
+    $0 -p $(expr $max_pomid + 1) -t $amount$sleep_unit -m $task -u $(date -d "+ $amount $unit" +%s) -e $(date -d "+ $amount $unit" --rfc-3339=s) &
 fi
 

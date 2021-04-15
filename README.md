@@ -4,7 +4,7 @@ CMD-line Pomodoro timer
 ## Commands
 ### Start Pomodoro
 ```bash
-pomo 25m task
+pomo task
 pomo 1h another-task
 ```
 
