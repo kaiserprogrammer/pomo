@@ -103,7 +103,7 @@ else
         task=$1
     else
         task=$2
-        amount=$(grep -Eo '[0-9]+' <<< "$1")
+        amount=$(grep -Eo '[0-9\.]+' <<< "$1")
         sleep_unit=$(grep -Eo '[[:alpha:]]' <<< "$1")
     fi
 
@@ -112,20 +112,18 @@ else
     fi
 
     case $sleep_unit in
-        s) unit="seconds";;
-        m) unit="minutes";;
-        h) unit="hours";;
+        s) ;;
+        m) amount=$(bc <<< "$amount * 60");;
+        h) amount=$(bc <<< "$amount * 3600");;
         *) echo "please use valid sleep time like '${amount}h' or '${amount}m' or '${amount}s'"; exit
     esac
 
     if [ -z $amount ]; then
         echo "no sleep time specified"; exit
-    elif [ -z $unit ]; then
-        echo "no unit specified"; exit
     elif [ -z $task ]; then
         echo "no task specified"; exit
     fi
 
-    $0 -p $(expr $max_pomid + 1) -t $amount$sleep_unit -m $task -u $(date -d "+ $amount $unit" +%s) -e $(date -d "+ $amount $unit" --rfc-3339=s) &
+    $0 -p $(expr $max_pomid + 1) -t ${amount}s -m $task -u $(date -d "+ $amount seconds" +%s) -e $(date -d "+ $amount seconds" --rfc-3339=s) &
 fi
 
