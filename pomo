@@ -105,6 +105,22 @@ else
         task=$2
         amount=$(grep -Eo '[0-9\.]+' <<< "$1")
         sleep_unit=$(grep -Eo '[[:alpha:]]' <<< "$1")
+
+
+        if [ $(wc -l <<< $amount) -gt 1 ]; then
+            sum=0
+            while read amount <&3 && read sleep_unit <&4; do
+                case $sleep_unit in
+                    s) sum=$(bc <<< "$sum + $amount");;
+                    m) sum=$(bc <<< "$sum + $amount * 60");;
+                    h) sum=$(bc <<< "$sum + $amount * 3600");;
+                    *) echo "please use valid sleep time like '${amount}h' or '${amount}m' or '${amount}s'"; exit
+                esac
+            done 3<<< $amount 4<<< $sleep_unit
+
+            amount=$sum
+            sleep_unit="s"
+        fi
     fi
 
     if [ -z $sleep_unit ]; then
